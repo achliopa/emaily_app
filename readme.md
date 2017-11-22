@@ -15,3 +15,17 @@
     "npm": "5.3.0"
   },
 * add a start script in package.json
+* create .gitignore file for node_module
+* create git repo 
+* install heroku cli
+* verify with heroku -v
+* login to heroku : heroku login
+* create app in heroku : heroku create <appname>
+* push code to heroku : git push heroku master (and deploy)
+* for node apps git repo to be pushed must have package.json at root
+
+# Section 3 - Authentication with Google OAuth
+
+## Lecture 19 - Setup Passport.JS
+
+* install passport and strategy to be used:  npm install --save passport passport-google-oauth20
