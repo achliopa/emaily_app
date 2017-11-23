@@ -74,3 +74,10 @@
   https://emaily-app-achliopa.c9users.io/* => 
   https://emaily-app-achliopa.c9users.io/auth/google/callback
 * set an express route for the callback uri
+
+# Section 4 - MongoDB to store User Data
+
+## Lecture 32 - ASetup Mongoose
+
+* Mogoose sets model class that represents collection in mongodb
+* we use schema model pattern
