@@ -41,3 +41,36 @@
 *  insert client source: https://emaily-app-achliopa.c9users.io
 *  insert authorized page source: https://emaily-app-achliopa.c9users.io/*
 *  get the keys . client id / secret (public/private key)
+*  store the keys securely on server (un tracked file, env variables)
+
+## Lecture 23 - First attempt to test the flow to Google
+
+*  include them in the call to OAuth with a callback for redirection on success and a callaback function
+    to be called when google replies with some data
+    passport.use(new GoogleStrategy(
+        {
+            clientID: keys.googleCLientID,
+            clientSecret: keys.googleClientSecret,
+            callbackURL: '/auth/google/callback'
+        }, (accessToken) => {
+            console.log(accessToken);
+        })
+    );
+* we use passport as a middleware. because we use google it will look for google strategy.
+* we pass some options specifying to google what access we want to have in the persons profile
+* go to /auth/google on a running server => ERROR!!!!!
+
+## Lecture 24-25 - Authorized Redirect URIs
+
+* Debugging with Steve: decypher the google reply 
+  error Google reply
+  https://accounts.google.com/o/oauth2/v2/auth?
+       response_type=code&
+       redirect_uri=http%3A%2F%2Femaily-app-achliopa.c9users.io%2Fauth%2Fgoogle%2Fcallback&
+       scope=profile%20email&
+       client_id=1001208759067-7beqtg5hlrpgevgtnlv56usr13qjk77f.apps.googleusercontent.com
+* security related error. the redirect uri must match the key otherwise its prone to hacking
+* we need to set properly the redirect uri in google console to be exact match
+  https://emaily-app-achliopa.c9users.io/* => 
+  https://emaily-app-achliopa.c9users.io/auth/google/callback
+* set an express route for the callback uri

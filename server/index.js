@@ -1,13 +1,17 @@
 const express = require('express');
-const passport =  require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+require('./services/passport');
+// const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
 const ip = process.env.IP || undefined;
 
 
-//passport.use(new GoogleStrategy());
+// authRoutes(app);
+require('./routes/authRoutes')(app);
+
+
+
 
 app.listen(port, ip, () => {
     console.log('server is running...');
