@@ -18,4 +18,13 @@ module.exports = (app) => {
     // now when we send the user to passport and google (with the strategy) he will have the code 
     //google gave us with the redirection
     app.get('/auth/google/callback', passport.authenticate('google'));  
+
+    app.get('/api/logout', (req,res) => {
+         req.logout();
+         res.send(req.user);
+    });
+
+    app.get('/api/current_user', (req,res) => {
+        res.send(req.user);
+    });
 };
