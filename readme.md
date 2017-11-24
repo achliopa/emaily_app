@@ -81,3 +81,50 @@
 
 * Mogoose sets model class that represents collection in mongodb
 * we use schema model pattern
+
+## Lecture 40 - SerDes User
+
+* Passport serializes deseirializes user to create token
+
+## Lecture 41 - Cookies
+
+* Express doesn't know how to handle cookies
+* npm install cookie-session
+* import cookiesession
+* add cookies to passport and express
+    app.use(
+    cookieSession({
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        keys: [keys.cookieKey]
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+## Lecture 42 - test the flow
+
+* test the flow after authenticating
+
+    app.get('/api/current_user', (req,res) => {
+        res.send(req.user); 
+    });
+
+* getback
+
+{
+_id: "5a17dabc862d350f78eaa5f6",
+googleId: "116159247268436008865",
+__v: 0
+}
+
+* logout
+        app.get('/api/logout', (req,res) => {
+         req.logout();
+         res.send(req.user);
+    });
+
+## LEcture 44 - Deep Dive
+
+* if cookie data (session data) is >4kB we should use express-session
+* express-session stores a reference to the session object which can be as large as we want

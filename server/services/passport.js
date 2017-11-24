@@ -5,6 +5,18 @@ const mongoose = require('mongoose');
 // our model class
 const User = mongoose.model('users'); 
 
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    User.findById(id)
+    .then((user) => {
+        done(null, user);
+    });
+});
+
 // we set a arrow callback to be called when the google rplies with some data
 passport.use(new GoogleStrategy(
     {
@@ -22,6 +34,8 @@ passport.use(new GoogleStrategy(
                 done(null, existingUser);
             } else {
                 new User({googleId: profile.id}).save()
+                /* second model instance comes in the promise, use the one in the promise
+                as it is the most fresh one */
                 .then((user) => {
                     done(null, user);
                 });                
