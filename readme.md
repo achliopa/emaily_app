@@ -128,3 +128,15 @@ __v: 0
 
 * if cookie data (session data) is >4kB we should use express-session
 * express-session stores a reference to the session object which can be as large as we want
+
+# Section 5
+
+## Lecture 45 - Dev & Prod
+
+* always have separate db and keys between prod and dev.
+* prod keys should be stored in prod server not on dev machine
+* create prod mongodb and prod api for google
+* create a switch file for keys.js - commit to git
+* move env vars for dev in dev.js - dont commit
+* point to process.env vars in prod.js - commit
+* in heroku set process.env vas for prod
