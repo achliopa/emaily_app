@@ -22,7 +22,7 @@ passport.use(new GoogleStrategy(
     {
         clientID: keys.googleCLientID,
         clientSecret: keys.googleClientSecret,
-        callbackURL: 'https://emaily-app-achliopa.c9users.io/auth/google/callback'
+        callbackURL: keys.callbackURI
     }, (accessToken, refreshToken, profile, done) => {
         // console.log('access token: ', accessToken);
         // console.log('refresh token: ', refreshToken);
