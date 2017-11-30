@@ -140,3 +140,32 @@ __v: 0
 * move env vars for dev in dev.js - dont commit
 * point to process.env vars in prod.js - commit
 * in heroku set process.env vas for prod
+* callback URL complains when running server behing proxy. it treat https as http.
+* either pass complete path as parameter or set proxy:tue in passport config
+
+# Section 6 - Switch to CLient Side and React
+
+## LEcture 51 - THe easy way 
+
+* use create-react-app
+* sudo npm install -g create-react-app
+* inside the server directory run: create-react-app client
+* sit back and wait
+
+## Lecture 52 - Separate FrontEnd Server
+
+* run npm start in client folder
+* change h2 in src/app.js
+* why 2 servers? to harness the simplisity of create-react-app to start learning react
+* merging two could be feasible
+
+## Lecture 53 - Running Together Client and Server
+
+* kill the client , go to server folder
+* install concurrently with npm
+* in package.json add scripts for client run and concurrent run
+    "scripts": {
+    "start": "node index.js",
+    "server": "nodemon index.js",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
