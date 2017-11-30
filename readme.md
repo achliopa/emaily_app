@@ -140,3 +140,4 @@ __v: 0
 * move env vars for dev in dev.js - dont commit
 * point to process.env vars in prod.js - commit
 * in heroku set process.env vas for prod
+
