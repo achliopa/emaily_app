@@ -23,23 +23,19 @@ passport.use(new GoogleStrategy(
         clientID: keys.googleCLientID,
         clientSecret: keys.googleClientSecret,
         callbackURL: keys.callbackURI
-    }, (accessToken, refreshToken, profile, done) => {
+        // correct solution proxy: true
+    }, async (accessToken, refreshToken, profile, done) => {
         // console.log('access token: ', accessToken);
         // console.log('refresh token: ', refreshToken);
         // console.log('profile: ', profile);
-        User.findOne({googleId: profile.id})
-        .then((existingUser) => {
-            if (existingUser) {
-                // we already have a record with this id
-                done(null, existingUser);
-            } else {
-                new User({googleId: profile.id}).save()
-                /* second model instance comes in the promise, use the one in the promise
-                as it is the most fresh one */
-                .then((user) => {
-                    done(null, user);
-                });                
-            }
-        });
+        const existingUser = await User.findOne({googleId: profile.id});
+        if (existingUser) {
+            // we already have a record with this id
+            return done(null, existingUser);
+        }
+        const user = await new User({googleId: profile.id}).save();
+        /* second model instance comes in the promise, use the one in the promise
+        as it is the most fresh one */
+        done(null, user);          
     })
 );

@@ -22,7 +22,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const port = process.env.PORT || 5000;
-const ip = process.env.IP || undefined;
+const ip = process.env.IP || 'localhost';
 
 
 // authRoutes(app);
