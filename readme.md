@@ -447,3 +447,50 @@ we add middlewares folder in server and asdd a file requireLogin
 ## Lecture 106 - Display Credit
 
 * add an li to the Header to show credit
+
+# Section 10 -Backend-Frontend Routing in Production
+
+## Lecture 107 - Express with CreateReactApp in Production
+
+* in production there is no createreactapp nor proxy. client side resides in public assets in backend express server and backend in node/express.api for api requests
+* if i run npm run build in client is generated production assets
+* it generates static js and css file bundles
+the challenge is to make the production express app run the production generated public assets
+
+* some routes are handled by react router and others by express. the assumption is to go first to react first (index.html)
+* other routes try to access specific assets (js files)
+
+## Lecture 108 - Routing in Production
+
+* we run npm run build in client side to  see the production generated assets in client/build directory
+* we add the following snipped in server side index.js file after express routes
+
+// order of code is critical on what to look first and what next in production
+// wrong order will create erroneous behaviour
+
+if(process.env.NODE_ENV === 'production') {
+  // Express will serve up production assets
+  // like our main.js file or main.css file
+  app.use(express.static('client/build'));
+
+  // Express will serve up the index.html file if it doesn't recognize the route. should always beplaced
+  // after express routes
+  app.get('*', (req,res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
+## Lecture 109 - Deployment Options
+
+* we need to ensure that before we deploy to heroku we build our react app
+* 3 options
+** 1) build client project -> commit built project -> commit to heroku
+** 2) push to heroku -> tell heroku to install all dependencies for client -> heroku builds project
+** 3)  push to github or CI server  -> run tests -> github builds and commits client -> github pushes build to heroku
+* we do not want to include our build to git
+
+## Lecture 111 - Add heroku build step
+
+* push to heroku -> heroku installs server deps -> heroku runs heroku-postbuid ->we tell heroku to install client deps -> we tell heroku to runnpm run build
+* see heroku node.js support -> see customizing the build process
+* we add    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client" in scripts in server package.json
