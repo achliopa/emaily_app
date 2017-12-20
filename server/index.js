@@ -24,7 +24,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const port = process.env.PORT || 5000;
-const ip = process.env.IP || 'localhost';
 
 
 // authRoutes(app);
@@ -48,6 +47,6 @@ if(process.env.NODE_ENV === 'production') {
 
 
 
-app.listen(port, ip, () => {
+app.listen(port, () => {
     console.log('server is running...');
 })
