@@ -347,3 +347,103 @@ to the reducers
 ## Lecture 86 - Link Tags
 
 * we use react router Link tag
+
+# Section 9 - Payments with Stripe
+
+## Lecture 88 - Billing Considerations
+
+* We are bad at security
+** NEVER accept raw credit card numbers
+** NEVER store credit card numbers
+** ALWAYS use an outside payment processor
+* Billing is Hard
+** Possible to avoid monthly payments/multiple plans?
+** Fraud and chargebacks are a pain
+
+* Recurly is based on stripe to handle monthly payments
+
+## Lecture 89 - Stripe billing process
+
+* billing form is a stripe api
+** user enters credit card
+** data are sent by form to stripe
+** stripe sends back a token
+** we send token to our api
+** our api confrms the charge was successful to stripe
+** we add credits to user axccount
+
+## Lecture 89 - Setup Stripe
+
+* signup to stripe
+* default is test mode
+* publishable key can be used in frontend
+* secret-key only in backend
+* we use stripe checkout
+* we use stipe checkout react https://github.com/azmenak/react-stripe-checkout
+* npm install --save react-stripe-checkout
+
+## Lecture 90 - Stripe API Keys
+
+* add publishable key and secret key in dev.js file and their reference to the prod.js file in config folder on the server side
+* add the keys to the heroky app env variables
+* any required file or imported is exposed to the outside world,
+separate environments wisely
+* when we import ES2015 modules we are not allowed to execute any logic before the import. so what we do in keys.js where we have an if statement before require cannot happen on client side.
+
+## Lecture 92 - ENV Vars in React
+
+* create react app has a solution (see: Adding Custom Environment Vars)
+* we follow the docs and create a .env file for development(.env.development) and production in the client root folder
+we add REACT_APP_STRIPE_KEY=pk_test_2mX9jD3jp43HoewOiZRl1KMV 
+in both files. frontend client doesnt need the secret key.
+* we access keys with process.env
+
+## Lecture 93 - Payment Component
+
+* we add a class based react componet for payments which renders the defualt export  (component) of react-strip-checkout
+* we name our new react component Payments
+* we add attributes to the stripe chekout comp
+* we render it in header using React 16 array element(must be uniquely identified with key)
+* stripe checkout token prop is the callback we pass to be called by stripe after 1st pahes of payment(check of card etc)
+* we console log token for testing. it contains all data
+* styling of button is terrible. we wrap StripeCheckout component around a button which we style ith materilaizecss class
+
+## Lecture 96 - Reuse Action Types
+
+* we reuse fetch_user action type to update user model where we pass in payload token data. we use it in our new action creator handleTOken
+* we use connect from react-redux to connect actions to props passing the handler to the stripe checkout
+* we create billing routes js in server routes folder
+* we import billingroutes in server index.js file
+* we add a stripe npm module for or backend. it uses the token sent by stripe and it exchanges with a charge to a credit card
+* stripe has charge object for charging credit cards (check node api docs)
+in stripe.charges.create the source atribute is the token we got from stripe
+* we install it: npm install --save stripe at server side
+* we add express route for posting to api/stripe in backend
+* we import stripe in billingroutes.js. api says it needs secret key as argument
+* we import keys,js from config
+* we pass secret key const stripe = require('stripe')(keys.stripeSecretKey);
+* we need to extract the token from the post header and use it in the charge. therefore we need body-parser
+* we install it at server side and import it at index.js. bodyParser is an express middleware so we use it. app.use(bodyParser.json());
+
+## Lecture 101 - Creating a charge object
+
+* we call stripe.charges.create method passing the charge object in the post api/stripe route
+* we use async/await to handle promise from stripe charge create
+
+## Lecture 103 - Adding credit to user
+
+* to keep track of credits we add another property to the user model
+* we want to add an option to this property (initial value). so we pass all options as an object to the schema
+* at route handler we increase the credit, persist it to the db and return the user back to the browser with response
+
+## Lecture 105 - Require authentication
+
+* no elegant solution: add if statement in post route
+* elegant: add a custom express middleware and add it in the routes we want.
+we add middlewares folder in server and asdd a file requireLogin
+* in this file we export an anonymous function where we follow the middleware pattern. inside we put the check logedin logic.
+* we can add middleware to express in general with app.use or in the express route handling functions  before the callback.
+
+## Lecture 106 - Display Credit
+
+* add an li to the Header to show credit
