@@ -494,3 +494,124 @@ if(process.env.NODE_ENV === 'production') {
 * push to heroku -> heroku installs server deps -> heroku runs heroku-postbuid ->we tell heroku to install client deps -> we tell heroku to runnpm run build
 * see heroku node.js support -> see customizing the build process
 * we add    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client" in scripts in server package.json
+
+# Section 10 - Surveys with Mongoose
+
+## Lecture 114 - Server Routes
+
+* get api/surveys "return list of surveys created by user"
+* post api/surveys/webhooks "record feedback from a user"
+* post api/surveys "create a new survey"
+** title subject, body, recipients
+
+## Lecture 114 - Survey Model
+
+* we need a link between user model class and survey model class (1:n relation)
+* we add a new survey schem in models folder
+* we import it into index.js
+* first draft of schema model has deficiencies (we set recipients a list of strings    recipients: [String]) 
+* survey model has no provision for feedback
+* we need to prevent duplicate votes
+* add yes count , no count
+* refactor reciptients to a list of ogjects with email string and voted flag
+* subdocument collections has meaning where the subdocument has no meaning on its own without the owner
+* user has references to the surveys he created. is not a subdocument collection as surveys have meaning on their own
+* reference is more efficient
+* collection document in mongodb has size limit of 4mb
+* so a survey can have ~ 2000recipients
+w* we create Recipient Schema and import it in Surveys where we setit as type for recipeints list
+* add a user - survey reference relationship adding this to Survey schema
+_user: { type: Schema.Types.ObjectId, ref: 'User' }
+
+## Lecture 120 - Survey Creation Route handler
+
+* add surveyRoutes.js file in server toutes folder and import it in apps index.js file
+* add post route app.post('/api/surveys'
+* add requireLogin middleware function in route
+* check if user has credit. we do it with middleware lige requireLogin even though we use it in only one route. for scalability and flexibility
+* we use body parsing to extract survey properties from req object with ES6 object destructuring.
+* before saving values to db using mongoose we import the Survey model using mongoose model method and not by  importing the file from models folder. THis is done to facilitae testing !?!?!
+
+
+## Lecture 123 - Create Recipients SubDoc Collections
+
+* recipients: comma separated string from req body parsing => string split(',') => array of strings => string map() => array of objects with email => add it to survey model instance. => save it to db
+
+## Lecture 125 - Create mailer
+
+* create survey instance (done)
+* create email template (tbd - htmp blob)
+* add these to mailer (tbd - email generation helper)
+* send mailer and email list to mail provider
+* we want one send email request to email provider per survey not one rquest per recipient
+* challenge is to distinguish recepient when they send feedback to survey
+* we cannot put identifying token to email as all get same email
+* we use send mail service provider cpabilites to solve this.
+* we use sendgrid.com mail provider. when they see a link in the mail body they direct it to their server , collect metrics and then back to the actual destination (our backend). we use these metrics (who clicked). send grid sends a message to our backend telling us who clicked (via token??).we call this webhook.
+
+## Lecture 127 - Sengrid Setup
+
+* we signup for the free plan
+* in the dashboard we go to settings -> api keys
+* we create full acess key
+* we add the key in congig files (dev and prod) and to heroku env variables
+* we install npm library sendgrid to server side
+
+## Lecture 128 - Mailer Setup
+
+* Mailer will be an ES6 Class
+* we populae properties from survey object, parse the class instanse object ot json and send it to sendgrid.
+* we create Mailer.js file in services folder in server side
+* we import sendgrid and ints child class mail which ew extend in Mailer.
+
+## Lecture 129 - Mailer in use
+
+* we assume Mailer is complete and we export it
+* we import Mailer in surveyRoutes
+* we create a mailer instance in post('/api/surveys after survey creation
+* we pass as argument survey , we need the template as well which does not e xist yet
+* we create a new folder in the service folder named emailTemplates
+* we add a surveyTemplate.js file in the folder and we export an anonymous function which represents the template. this functions takes as argument the survey to populate its fields with survey body
+* we import the surveytemplate in surveyroute in mailer instantiation passing survey as an argument.
+
+## Lecture 130 - Mailer Constructor 
+
+* typical ES2015 contstructor
+* a lot of sendgrid specific code  (param settings)
+* we use destructuring in constructor params to keep it general
+* we use sendgrid helper functions and we define one of our own to pass recipient emails
+
+## Lecture 131 - Boilerplate for sending emails
+
+* we implement addClickTracking helper function in Mailer copying code from sendgrid docs
+so that we can track users to avoid duplicate votes
+* we implement addRecipients helper function in Mailer to use sendgrid helper utilities to add recipients to the mailer object
+* we send our api key to sendgrid to use the service using sgApi
+* we add a send function so that we can send mailer object to sendgrid, again we take APi methods to do this
+* we invoce the method mailer.send() in surveyRoutes post route
+
+## Lecture 134 - Testing email sending
+
+* i  can test post api/surves route in postman but its difficult to authenticate and add credit in postman.
+* we will test in the app by a direct call o the route through axios library
+* we add the axios import and set to window in client side route source file index.js
+import axios from 'axios';
+window.axios = axios;
+* now we go to the app homepage we launch dev tools and in console we can test by invoking axios methods
+* after testing we remove axios from index.js
+* we add html code to format our surveytemplate
+
+## Lecture 136 - Polish the route handler
+
+* mailer.send() is asynchronous so we put await in its call. also the parent function (post route) we make it async as well to use async/await pattern
+* we save the survey
+* we deduct a credit from user
+* we save th user
+* we return udated user to frontend
+* we have a lot of awaits so we add error handling (try catch)
+
+## Lecture 137 - verify sendgrid click tracking
+
+* sendgrid nows who clicked. we can verify it inthe dashboard
+* we need to pass absolute domain in the mail body for click link, as email is external to our app. we pass domain path as a env key in config
+* we add a route in surveys to redirect users after clicking the links in our email. just plain text

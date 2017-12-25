@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 // const authRoutes = require('./routes/authRoutes');
 require('./models/User');
+require('./models/Survey');
 require('./services/passport');
 
 mongoose.connect(keys.mongoURI);
@@ -29,6 +30,7 @@ const port = process.env.PORT || 5000;
 // authRoutes(app);
 require('./routes/authRoutes')(app);
 require('./routes/billingRoutes')(app);
+require('./routes/surveyRoutes')(app);
 
 // order of code is critical on what to look first and what next in production
 // wrong order will create erroneous behaviour
