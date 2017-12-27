@@ -615,3 +615,71 @@ window.axios = axios;
 * sendgrid nows who clicked. we can verify it inthe dashboard
 * we need to pass absolute domain in the mail body for click link, as email is external to our app. we pass domain path as a env key in config
 * we add a route in surveys to redirect users after clicking the links in our email. just plain text
+
+# Section 11 - Client Side survey
+
+## Lecture 139 - Survey Creation
+
+* we make a dashboard react stateless function component in client side components folder and we impor it in App.js
+* we add a materializecss fixed action button in dashboard jsx
+* workaround . add <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> in client public index.html
+
+## Lecture 142 - SurveyNew Form
+
+* we use redux form
+* form is broken into multiple react components
+* we have a tree like structure. data must traverse the tree. redux solves it
+* redux form gives all redux related implementation for free
+* redux form add a form reducer
+* install it in client: npm install --save redux-form
+* we add redux from reducer by importing it and adding it into combine reducers method in reducers folder (index.js)
+* we add anew forler in compoents for form related reactcomponents
+* we add SurveyNew(root compoent) as a stateful class component and add it to our app (App.js)
+* we add SurveyForm as a stateful class component and add it to SurveyNew
+*suveyForm hosts the form so we import reduxForm from redux-form to connect to the redux store and the form reducer state. we treat it like connect so we add a wrapper to export. we pass as argument an object containing the form object
+
+## Lecture 146 - Redux Form in Practice
+
+* we import Field component from redux-form. in SurveyForm
+* we add it in jsx and pass the mandatory props
+        <Field 
+          type="text"
+          name="surveyTitle"
+          component="input"
+        />
+* name value represents the key in redux store for the value
+* component can be custom object passed as ={Objname}
+* we wrap field in form element
+* reduxform passes us the function handleSubmit as a prop
+ we can pass in it an arrow funtion to implement custom code
+<form onSubmit={this.props.handleSubmit(values => console.log(values))}>
+* to dry up code and avoid repetition we define our own SurveyField component using the component prop from Field comp.
+* also we define a helper function in SurveyForm to host field components 
+* redux-form passes a lot of props to our custom component
+* we pass them using destructuring and we pass all handlers  using ES6 in imput element.
+* to avoid repetition we use an array for unique info and we render iteratively the fields using lodash helper _,map function
+* in reduxForm connect like object object we can pass a validate helper function which will run in all fields adding validation capabilities to the form
+* validate helper function returns an error object whose properties when named as a field are passed as error in the meta prop
+* touched propertu of meta shows if field is touched.
+* we add validation for email correctness and to forbid empty strings
+
+## Lecture 157 - Toggle Visibility
+
+* We want to switch between SurveyForm and Review when conditions are met. We use React Component State due to the app component hierarchy. they are both under SurveyNew so no tree traversing passing props (design flaw)
+* we render the two components depending on state
+* we pass to the form a callback function so that when we see appropriate we can change the state and toggle components. we pass the callback in props
+* to persist form data after leaving form (redux-form by default deletes them) in the reduxform helper we set destroyOnUnmount to false
+* we get access to form data with redux store state using connect helper from react-redux
+* form values are residing in state in forms.surveyForm.values
+* surveyForm is the namespace we defined to identify the specific form in redux-form. we can have other forms with other namespaces
+* we map state to props to insert them in react component
+* sending the survey from surveyreviewform will trigger an app cahnge of state in redux . so we call an action generator
+* we create a new actiongenerator add it with connect helper and attach it to the onCLick event. to prevent instant call we put it in an arrow funtion.we also need to pass it as a  prop
+* when we go back and we return to the form we want input data to be gone. we do this by importing reduxForm helper in the parent component surveyForm and destructuring th surveyForm object. this happenens because we dont disable destroyonunmount. so  when component is unmounted data are destroyed
+* we refactor renaming email property to recipients to match with backend survey object
+
+## Lecture 167 - Redirect on Success
+
+* to redirect we need react-router
+* action generator doesnt know about react router neither its caller component. we need to make them know. we use withRouter helper function of React-Router and we pass the history object. we use withRouter like connect wrapping the component with it in export
+* history object is passed in props, we extract it with destructuring and pass it to the action generator
