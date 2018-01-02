@@ -683,3 +683,39 @@ window.axios = axios;
 * to redirect we need react-router
 * action generator doesnt know about react router neither its caller component. we need to make them know. we use withRouter helper function of React-Router and we pass the history object. we use withRouter like connect wrapping the component with it in export
 * history object is passed in props, we extract it with destructuring and pass it to the action generator
+
+# Section 12 - Handling Webhook Data
+
+## Lecture 170 - Localtunnel Setup
+
+* in production sendgring makes a postrequest every 30 seconds or so wth all the clicks that happened. we process these click in our API
+
+* in dev environment sendgrid haas problem to send post request to localhost. to sove it we use localtunnel service
+* sendgrid sends request to localtunnel.com
+* localtunnel forwards request to a localtunnel server on our machine
+* localtunnel server forwards request to localhost
+* install it locally in server with npm install --save localtunnel
+* add run script in package.json at server side . define local port and subdomain for global access.     "webhook": " lt -p 5000 -s agilengemaily"
+* add script in in the run dev command
+* add localtunnel server path to sendgrid settings-> email settings -> event notifications. not only server but the complete path https://agilengemaily.localtunnel.me/api/surveys/webhooks
+* add this post route in surveyroutes
+* to count votes we change the link in the email with suerveyid/choice
+* we need to filter sendgrid replies to APi
+* we install lodash and path-parser to server npm install --save lodash path-parser
+* we remove the elemets that are undefined with lodash compact (array compact) const compactEvents = _.compact(events);
+* we remove duplicates in the array by caling lodash iniqBy method
+const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+* as lodash functions are used and their output is passed to the next lodash function using temp vars. lodach has chain function which allows function chaining of the methods appllied to the array (like express middelwares) eliminating the need for temps.
+* we choose to move all the query and update logic in the mogoose side. for performance. we use updateOne funct and we use the $elemMatch to search in the subDocument in efficient way. the second param in updateOne is the update object where $inc and $set reserved words (mongoDB lang) are used and $ is referencecing the return element of the $elemMatch.
+      .each({ surveyId, email, choice } => {
+        Survey.updateOne({
+          _id: surveyid,
+          recipients: {
+            $elemMatch: { email: email, responded: false }
+          }
+        }, {
+            $inc: { [choice]: 1 },
+            $set: { 'recipients.$.responded': true }
+        }).exec
+we place the query code in _.each as we run it for all returned evetns in webhook (objects sent by sendgrid). exec() executes the queryt
+* we dont use async awauit as sendgrid doesnt expect any resply
