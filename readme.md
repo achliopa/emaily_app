@@ -719,3 +719,21 @@ const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
         }).exec
 we place the query code in _.each as we run it for all returned evetns in webhook (objects sent by sendgrid). exec() executes the queryt
 * we dont use async awauit as sendgrid doesnt expect any resply
+
+# Section 13 - Home Run
+
+## Lecture 188 - Finding a List of Surveys
+
+* we create a new route api/surveys in surveyroutes.js
+* we need to improve efficiency. to query surveys and return the ones of the user without going through  the recipients list which is large
+* we use query.select to exclude recipients (mongoose API)
+* we use redux to connect survey data from backend to frontend for presentation
+* we add a new action type in client actions index.js file FETCH_SURVEYS and an action generator to get the backend api survey data into frontend react export const fetchSurveys = () => async dispatch => {
+  const res = await axios.get('/api/surveys');
+  dispatch({ type: FETCH_SURVEYS, payload: res.data });
+};
+* we add a Redux reducer in reducers folder (surveysReducer) using authReducer boilerplate. we add it in combinedReducer to add it to state
+
+## Lecture 192 - Wiring React to Redux
+
+* we add a new React component (SurveyList) to show the survey data and add it to Dashboard
